@@ -6,7 +6,7 @@ $(function() {
 
     $('input[type=file]').change(function() {
 
-        var subscriptionKey = "a7c44c7bc9d541dcb5682b17239d05ca";
+        var subscriptionKey = "8fafcfb9-e269-45d6-90cc-1bd870462803";
 
         var uriBase = "https://facetest33.cognitiveservices.azure.com/";
 
