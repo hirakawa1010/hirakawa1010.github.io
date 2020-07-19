@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/OBJLoader.js"></script>
+    <script src="js/MTLLoader.js"></script>
+
+
+    <script>
+      // ページの読み込みを待つ
+      window.addEventListener('load', init);
+
+      function init() {
+        // サイズを指定
+        const width = 960;
+        const height = 540;
+
+        // レンダラーを作成
+        const renderer = new THREE.WebGLRenderer({
+          canvas: document.querySelector('#myCanvas')
+        });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(width, height);
+
+        // シーンを作成
+        const scene = new THREE.Scene();
+
+        // カメラを作成
+        const camera = new THREE.PerspectiveCamera(
+          45,
+          width / height,
+          0.1,
+          10000
+        );
+        // カメラの初期座標を設定
+        camera.position.set(0, 10, 10);
+
+        // カメラコントローラーを作成
+        const controls = new THREE.OrbitControls(camera);
+        controls.target.set(0, 3, 0);
+        controls.update();
+
+        // 平行光源を作成
+        const directionalLight = new THREE.DirectionalLight(0xffffff);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+        // 環境光を追加
+        const ambientLight = new THREE.AmbientLight(0x333333);
+        scene.add(ambientLight);
+
+        // 3DS形式のモデルデータを読み込む
+
+        /*const mtlLoader = new THREE.MTLLoader();
+        mtlLoader.load('kadai1.mtl',(materials)=>{
+            materials.preload();
+
+
+            const objLoader=THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.load('kadai1.obj',(object)=>{
+                obj=new THREE.Object3D();
+                obj.add(object);
+                scene.add(obj);  
+
+            });
+        });
+        var obj = new THREE.Mesh();
+
+*/
+
+        var geometry = new THREE.BoxGeometry(10,10,10);
+    var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    var box = new THREE.Mesh(geometry, material);
+    scene.add(box);
+
+
+
+        tick();
+
+        // 毎フレーム時に実行されるループイベントです
+        function tick() {
+          // レンダリング
+          renderer.render(scene, camera);
+          requestAnimationFrame(tick);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+  </body>
+</html>
