@@ -1,4 +1,3 @@
-console.warn( "THREE.FBXLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author Kyle-Larson https://github.com/Kyle-Larson
  * @author Takahiro https://github.com/takahirox
@@ -19,8 +18,55 @@ console.warn( "THREE.FBXLoader: As part of the transition to ES6 Modules, the fi
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
  */
 
+import {
+	AmbientLight,
+	AnimationClip,
+	Bone,
+	BufferAttribute,
+	BufferGeometry,
+	ClampToEdgeWrapping,
+	Color,
+	DirectionalLight,
+	EquirectangularReflectionMapping,
+	Euler,
+	FileLoader,
+	Float32BufferAttribute,
+	Group,
+	Line,
+	LineBasicMaterial,
+	Loader,
+	LoaderUtils,
+	MathUtils,
+	Matrix3,
+	Matrix4,
+	Mesh,
+	MeshLambertMaterial,
+	MeshPhongMaterial,
+	NumberKeyframeTrack,
+	Object3D,
+	OrthographicCamera,
+	PerspectiveCamera,
+	PointLight,
+	PropertyBinding,
+	Quaternion,
+	QuaternionKeyframeTrack,
+	RepeatWrapping,
+	Skeleton,
+	SkinnedMesh,
+	SpotLight,
+	Texture,
+	TextureLoader,
+	Uint16BufferAttribute,
+	Vector3,
+	Vector4,
+	VectorKeyframeTrack,
+	sRGBEncoding
+} from "../../../build/three.module.js";
+import { Inflate } from "../libs/inflate.module.min.js";
+import { NURBSCurve } from "../curves/NURBSCurve.js";
 
-THREE.FBXLoader = ( function () {
+
+var FBXLoader = ( function () {
 
 	var fbxTree;
 	var connections;
@@ -28,11 +74,11 @@ THREE.FBXLoader = ( function () {
 
 	function FBXLoader( manager ) {
 
-		THREE.Loader.call( this, manager );
+		Loader.call( this, manager );
 
 	}
 
-	FBXLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	FBXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: FBXLoader,
 
@@ -40,9 +86,9 @@ THREE.FBXLoader = ( function () {
 
 			var scope = this;
 
-			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-			var loader = new THREE.FileLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 
@@ -100,7 +146,7 @@ THREE.FBXLoader = ( function () {
 
 			// console.log( fbxTree );
 
-			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+			var textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 			return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
@@ -108,7 +154,7 @@ THREE.FBXLoader = ( function () {
 
 	} );
 
-	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a THREE.Group
+	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a Group
 	function FBXTreeParser( textureLoader, manager ) {
 
 		this.textureLoader = textureLoader;
@@ -341,8 +387,8 @@ THREE.FBXLoader = ( function () {
 			// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
 			// 0: repeat(default), 1: clamp
 
-			texture.wrapS = valueU === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-			texture.wrapT = valueV === 0 ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+			texture.wrapS = valueU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
+			texture.wrapT = valueV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
 
 			if ( 'Scaling' in textureNode ) {
 
@@ -357,7 +403,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		// load a texture specified as a blob or data URI, or via an external URL using THREE.TextureLoader
+		// load a texture specified as a blob or data URI, or via an external URL using TextureLoader
 		loadTexture: function ( textureNode, images ) {
 
 			var fileName;
@@ -389,7 +435,7 @@ THREE.FBXLoader = ( function () {
 				if ( loader === null ) {
 
 					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
-					texture = new THREE.Texture();
+					texture = new Texture();
 
 				} else {
 
@@ -400,7 +446,7 @@ THREE.FBXLoader = ( function () {
 			} else if ( extension === 'psd' ) {
 
 				console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
-				texture = new THREE.Texture();
+				texture = new Texture();
 
 			} else {
 
@@ -463,14 +509,14 @@ THREE.FBXLoader = ( function () {
 			switch ( type.toLowerCase() ) {
 
 				case 'phong':
-					material = new THREE.MeshPhongMaterial();
+					material = new MeshPhongMaterial();
 					break;
 				case 'lambert':
-					material = new THREE.MeshLambertMaterial();
+					material = new MeshLambertMaterial();
 					break;
 				default:
 					console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
-					material = new THREE.MeshPhongMaterial();
+					material = new MeshPhongMaterial();
 					break;
 
 			}
@@ -496,12 +542,12 @@ THREE.FBXLoader = ( function () {
 
 			if ( materialNode.Diffuse ) {
 
-				parameters.color = new THREE.Color().fromArray( materialNode.Diffuse.value );
+				parameters.color = new Color().fromArray( materialNode.Diffuse.value );
 
 			} else if ( materialNode.DiffuseColor && materialNode.DiffuseColor.type === 'Color' ) {
 
 				// The blender exporter exports diffuse here instead of in materialNode.Diffuse
-				parameters.color = new THREE.Color().fromArray( materialNode.DiffuseColor.value );
+				parameters.color = new Color().fromArray( materialNode.DiffuseColor.value );
 
 			}
 
@@ -513,12 +559,12 @@ THREE.FBXLoader = ( function () {
 
 			if ( materialNode.Emissive ) {
 
-				parameters.emissive = new THREE.Color().fromArray( materialNode.Emissive.value );
+				parameters.emissive = new Color().fromArray( materialNode.Emissive.value );
 
 			} else if ( materialNode.EmissiveColor && materialNode.EmissiveColor.type === 'Color' ) {
 
 				// The blender exporter exports emissive color here instead of in materialNode.Emissive
-				parameters.emissive = new THREE.Color().fromArray( materialNode.EmissiveColor.value );
+				parameters.emissive = new Color().fromArray( materialNode.EmissiveColor.value );
 
 			}
 
@@ -554,12 +600,12 @@ THREE.FBXLoader = ( function () {
 
 			if ( materialNode.Specular ) {
 
-				parameters.specular = new THREE.Color().fromArray( materialNode.Specular.value );
+				parameters.specular = new Color().fromArray( materialNode.Specular.value );
 
 			} else if ( materialNode.SpecularColor && materialNode.SpecularColor.type === 'Color' ) {
 
 				// The blender exporter exports specular color here instead of in materialNode.Specular
-				parameters.specular = new THREE.Color().fromArray( materialNode.SpecularColor.value );
+				parameters.specular = new Color().fromArray( materialNode.SpecularColor.value );
 
 			}
 
@@ -581,7 +627,7 @@ THREE.FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = scope.getTexture( textureMap, child.ID );
-						parameters.map.encoding = THREE.sRGBEncoding;
+						parameters.map.encoding = sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
@@ -590,7 +636,7 @@ THREE.FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
-						parameters.emissiveMap.encoding = THREE.sRGBEncoding;
+						parameters.emissiveMap.encoding = sRGBEncoding;
 						break;
 
 					case 'NormalMap':
@@ -600,13 +646,13 @@ THREE.FBXLoader = ( function () {
 
 					case 'ReflectionColor':
 						parameters.envMap = scope.getTexture( textureMap, child.ID );
-						parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
-						parameters.envMap.encoding = THREE.sRGBEncoding;
+						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = scope.getTexture( textureMap, child.ID );
-						parameters.specularMap.encoding = THREE.sRGBEncoding;
+						parameters.specularMap.encoding = sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
@@ -720,8 +766,8 @@ THREE.FBXLoader = ( function () {
 					ID: child.ID,
 					indices: [],
 					weights: [],
-					transformLink: new THREE.Matrix4().fromArray( boneNode.TransformLink.a ),
-					// transform: new THREE.Matrix4().fromArray( boneNode.Transform.a ),
+					transformLink: new Matrix4().fromArray( boneNode.TransformLink.a ),
+					// transform: new Matrix4().fromArray( boneNode.Transform.a ),
 					// linkMode: boneNode.Mode,
 
 				};
@@ -782,10 +828,10 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		// create the main THREE.Group() to be returned by the loader
+		// create the main Group() to be returned by the loader
 		parseScene: function ( deformers, geometryMap, materialMap ) {
 
-			sceneGraph = new THREE.Group();
+			sceneGraph = new Group();
 
 			var modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
 
@@ -881,16 +927,16 @@ THREE.FBXLoader = ( function () {
 							break;
 						case 'LimbNode':
 						case 'Root':
-							model = new THREE.Bone();
+							model = new Bone();
 							break;
 						case 'Null':
 						default:
-							model = new THREE.Group();
+							model = new Group();
 							break;
 
 					}
 
-					model.name = node.attrName ? THREE.PropertyBinding.sanitizeNodeName( node.attrName ) : '';
+					model.name = node.attrName ? PropertyBinding.sanitizeNodeName( node.attrName ) : '';
 
 					model.ID = id;
 
@@ -920,13 +966,13 @@ THREE.FBXLoader = ( function () {
 						if ( rawBone.ID === parent.ID ) {
 
 							var subBone = bone;
-							bone = new THREE.Bone();
+							bone = new Bone();
 
 							bone.matrixWorld.copy( rawBone.transformLink );
 
 							// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
 
-							bone.name = name ? THREE.PropertyBinding.sanitizeNodeName( name ) : '';
+							bone.name = name ? PropertyBinding.sanitizeNodeName( name ) : '';
 							bone.ID = id;
 
 							skeleton.bones[ i ] = bone;
@@ -951,7 +997,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		// create a THREE.PerspectiveCamera or THREE.OrthographicCamera
+		// create a PerspectiveCamera or OrthographicCamera
 		createCamera: function ( relationships ) {
 
 			var model;
@@ -971,7 +1017,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( cameraAttribute === undefined ) {
 
-				model = new THREE.Object3D();
+				model = new Object3D();
 
 			} else {
 
@@ -1021,17 +1067,17 @@ THREE.FBXLoader = ( function () {
 				switch ( type ) {
 
 					case 0: // Perspective
-						model = new THREE.PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
+						model = new PerspectiveCamera( fov, aspect, nearClippingPlane, farClippingPlane );
 						if ( focalLength !== null ) model.setFocalLength( focalLength );
 						break;
 
 					case 1: // Orthographic
-						model = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
+						model = new OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
 						break;
 
 					default:
 						console.warn( 'THREE.FBXLoader: Unknown camera type ' + type + '.' );
-						model = new THREE.Object3D();
+						model = new Object3D();
 						break;
 
 				}
@@ -1042,7 +1088,7 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		// Create a THREE.DirectionalLight, THREE.PointLight or THREE.SpotLight
+		// Create a DirectionalLight, PointLight or SpotLight
 		createLight: function ( relationships ) {
 
 			var model;
@@ -1062,7 +1108,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( lightAttribute === undefined ) {
 
-				model = new THREE.Object3D();
+				model = new Object3D();
 
 			} else {
 
@@ -1083,7 +1129,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( lightAttribute.Color !== undefined ) {
 
-					color = new THREE.Color().fromArray( lightAttribute.Color.value );
+					color = new Color().fromArray( lightAttribute.Color.value );
 
 				}
 
@@ -1117,11 +1163,11 @@ THREE.FBXLoader = ( function () {
 				switch ( type ) {
 
 					case 0: // Point
-						model = new THREE.PointLight( color, intensity, distance, decay );
+						model = new PointLight( color, intensity, distance, decay );
 						break;
 
 					case 1: // Directional
-						model = new THREE.DirectionalLight( color, intensity );
+						model = new DirectionalLight( color, intensity );
 						break;
 
 					case 2: // Spot
@@ -1129,7 +1175,7 @@ THREE.FBXLoader = ( function () {
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
-							angle = THREE.MathUtils.degToRad( lightAttribute.InnerAngle.value );
+							angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 						}
 
@@ -1139,17 +1185,17 @@ THREE.FBXLoader = ( function () {
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 							// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 							// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-							penumbra = THREE.MathUtils.degToRad( lightAttribute.OuterAngle.value );
+							penumbra = MathUtils.degToRad( lightAttribute.OuterAngle.value );
 							penumbra = Math.max( penumbra, 1 );
 
 						}
 
-						model = new THREE.SpotLight( color, intensity, distance, angle, penumbra, decay );
+						model = new SpotLight( color, intensity, distance, angle, penumbra, decay );
 						break;
 
 					default:
-						console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a THREE.PointLight.' );
-						model = new THREE.PointLight( color, intensity );
+						console.warn( 'THREE.FBXLoader: Unknown light type ' + lightAttribute.LightType.value + ', defaulting to a PointLight.' );
+						model = new PointLight( color, intensity );
 						break;
 
 				}
@@ -1200,7 +1246,7 @@ THREE.FBXLoader = ( function () {
 
 			} else {
 
-				material = new THREE.MeshPhongMaterial( { color: 0xcccccc } );
+				material = new MeshPhongMaterial( { color: 0xcccccc } );
 				materials.push( material );
 
 			}
@@ -1223,12 +1269,12 @@ THREE.FBXLoader = ( function () {
 
 				} );
 
-				model = new THREE.SkinnedMesh( geometry, material );
+				model = new SkinnedMesh( geometry, material );
 				model.normalizeSkinWeights();
 
 			} else {
 
-				model = new THREE.Mesh( geometry, material );
+				model = new Mesh( geometry, material );
 
 			}
 
@@ -1247,8 +1293,8 @@ THREE.FBXLoader = ( function () {
 			}, null );
 
 			// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
-			var material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 1 } );
-			return new THREE.Line( geometry, material );
+			var material = new LineBasicMaterial( { color: 0x3300ff, linewidth: 1 } );
+			return new Line( geometry, material );
 
 		},
 
@@ -1304,7 +1350,7 @@ THREE.FBXLoader = ( function () {
 
 							} else { // Cameras and other Object3Ds
 
-								model.lookAt( new THREE.Vector3().fromArray( pos ) );
+								model.lookAt( new Vector3().fromArray( pos ) );
 
 							}
 
@@ -1341,7 +1387,7 @@ THREE.FBXLoader = ( function () {
 
 								var model = modelMap.get( geoConnParent.ID );
 
-								model.bind( new THREE.Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
+								model.bind( new Skeleton( skeleton.bones ), bindMatrices[ geoConnParent.ID ] );
 
 							}
 
@@ -1373,13 +1419,13 @@ THREE.FBXLoader = ( function () {
 
 							poseNodes.forEach( function ( poseNode ) {
 
-								bindMatrices[ poseNode.Node ] = new THREE.Matrix4().fromArray( poseNode.Matrix.a );
+								bindMatrices[ poseNode.Node ] = new Matrix4().fromArray( poseNode.Matrix.a );
 
 							} );
 
 						} else {
 
-							bindMatrices[ poseNodes.Node ] = new THREE.Matrix4().fromArray( poseNodes.Matrix.a );
+							bindMatrices[ poseNodes.Node ] = new Matrix4().fromArray( poseNodes.Matrix.a );
 
 						}
 
@@ -1405,8 +1451,8 @@ THREE.FBXLoader = ( function () {
 
 				if ( r !== 0 || g !== 0 || b !== 0 ) {
 
-					var color = new THREE.Color( r, g, b );
-					sceneGraph.add( new THREE.AmbientLight( color, 1 ) );
+					var color = new Color( r, g, b );
+					sceneGraph.add( new AmbientLight( color, 1 ) );
 
 				}
 
@@ -1586,16 +1632,16 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
+		// Generate a BufferGeometry from a node in FBXTree.Objects.Geometry
 		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
 
-			var geo = new THREE.BufferGeometry();
+			var geo = new BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
 
 			var geoInfo = this.parseGeoNode( geoNode, skeleton );
 			var buffers = this.genBuffers( geoInfo );
 
-			var positionAttribute = new THREE.Float32BufferAttribute( buffers.vertex, 3 );
+			var positionAttribute = new Float32BufferAttribute( buffers.vertex, 3 );
 
 			positionAttribute.applyMatrix4( preTransform );
 
@@ -1603,15 +1649,15 @@ THREE.FBXLoader = ( function () {
 
 			if ( buffers.colors.length > 0 ) {
 
-				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( buffers.colors, 3 ) );
+				geo.setAttribute( 'color', new Float32BufferAttribute( buffers.colors, 3 ) );
 
 			}
 
 			if ( skeleton ) {
 
-				geo.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
+				geo.setAttribute( 'skinIndex', new Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
 
-				geo.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
+				geo.setAttribute( 'skinWeight', new Float32BufferAttribute( buffers.vertexWeights, 4 ) );
 
 				// used later to bind the skeleton to the model
 				geo.FBX_Deformer = skeleton;
@@ -1620,9 +1666,9 @@ THREE.FBXLoader = ( function () {
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
+				var normalMatrix = new Matrix3().getNormalMatrix( preTransform );
 
-				var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
+				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
 				normalAttribute.applyNormalMatrix( normalMatrix );
 
 				geo.setAttribute( 'normal', normalAttribute );
@@ -1641,7 +1687,7 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				geo.setAttribute( name, new THREE.Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
+				geo.setAttribute( name, new Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
 
 			} );
 
@@ -2122,7 +2168,7 @@ THREE.FBXLoader = ( function () {
 
 			var morphBuffers = this.genBuffers( morphGeoInfo );
 
-			var positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
+			var positionAttribute = new Float32BufferAttribute( morphBuffers.vertex, 3 );
 			positionAttribute.name = name || morphGeoNode.attrName;
 
 			positionAttribute.applyMatrix4( preTransform );
@@ -2252,10 +2298,10 @@ THREE.FBXLoader = ( function () {
 		// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 		parseNurbsGeometry: function ( geoNode ) {
 
-			if ( THREE.NURBSCurve === undefined ) {
+			if ( NURBSCurve === undefined ) {
 
-				console.error( 'THREE.FBXLoader: The loader relies on THREE.NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
-				return new THREE.BufferGeometry();
+				console.error( 'THREE.FBXLoader: The loader relies on NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
+				return new BufferGeometry();
 
 			}
 
@@ -2264,7 +2310,7 @@ THREE.FBXLoader = ( function () {
 			if ( isNaN( order ) ) {
 
 				console.error( 'THREE.FBXLoader: Invalid Order %s given for geometry ID: %s', geoNode.Order, geoNode.id );
-				return new THREE.BufferGeometry();
+				return new BufferGeometry();
 
 			}
 
@@ -2276,7 +2322,7 @@ THREE.FBXLoader = ( function () {
 
 			for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
-				controlPoints.push( new THREE.Vector4().fromArray( pointsValues, i ) );
+				controlPoints.push( new Vector4().fromArray( pointsValues, i ) );
 
 			}
 
@@ -2299,7 +2345,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+			var curve = new NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
 			var vertices = curve.getPoints( controlPoints.length * 7 );
 
 			var positions = new Float32Array( vertices.length * 3 );
@@ -2310,8 +2356,8 @@ THREE.FBXLoader = ( function () {
 
 			} );
 
-			var geometry = new THREE.BufferGeometry();
-			geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			var geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 			return geometry;
 
@@ -2506,7 +2552,7 @@ THREE.FBXLoader = ( function () {
 
 										var node = {
 
-											modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
+											modelName: rawModel.attrName ? PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 											ID: rawModel.id,
 											initialPosition: [ 0, 0, 0 ],
 											initialRotation: [ 0, 0, 0 ],
@@ -2526,7 +2572,7 @@ THREE.FBXLoader = ( function () {
 
 										} );
 
-										if ( ! node.transform ) node.transform = new THREE.Matrix4();
+										if ( ! node.transform ) node.transform = new Matrix4();
 
 										// if the animated model is pre rotated, we'll have to apply the pre rotations to every
 										// animation value as well
@@ -2561,7 +2607,7 @@ THREE.FBXLoader = ( function () {
 
 									var node = {
 
-										modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
+										modelName: rawModel.attrName ? PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName,
 
 									};
@@ -2589,7 +2635,7 @@ THREE.FBXLoader = ( function () {
 		},
 
 		// parse nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
-		// hierarchy. Each Stack node will be used to create a THREE.AnimationClip
+		// hierarchy. Each Stack node will be used to create a AnimationClip
 		parseAnimStacks: function ( layersMap ) {
 
 			var rawStacks = fbxTree.Objects.AnimationStack;
@@ -2635,7 +2681,7 @@ THREE.FBXLoader = ( function () {
 
 			} );
 
-			return new THREE.AnimationClip( rawClip.name, - 1, tracks );
+			return new AnimationClip( rawClip.name, - 1, tracks );
 
 		},
 
@@ -2643,14 +2689,14 @@ THREE.FBXLoader = ( function () {
 
 			var tracks = [];
 
-			var initialPosition = new THREE.Vector3();
-			var initialRotation = new THREE.Quaternion();
-			var initialScale = new THREE.Vector3();
+			var initialPosition = new Vector3();
+			var initialRotation = new Quaternion();
+			var initialScale = new Vector3();
 
 			if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
 
 			initialPosition = initialPosition.toArray();
-			initialRotation = new THREE.Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
+			initialRotation = new Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
 			initialScale = initialScale.toArray();
 
 			if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
@@ -2690,7 +2736,7 @@ THREE.FBXLoader = ( function () {
 			var times = this.getTimesForAllAxes( curves );
 			var values = this.getKeyframeTrackValues( times, curves, initialValue );
 
-			return new THREE.VectorKeyframeTrack( modelName + '.' + type, times, values );
+			return new VectorKeyframeTrack( modelName + '.' + type, times, values );
 
 		},
 
@@ -2699,21 +2745,21 @@ THREE.FBXLoader = ( function () {
 			if ( curves.x !== undefined ) {
 
 				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( THREE.MathUtils.degToRad );
+				curves.x.values = curves.x.values.map( MathUtils.degToRad );
 
 			}
 
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( THREE.MathUtils.degToRad );
+				curves.y.values = curves.y.values.map( MathUtils.degToRad );
 
 			}
 
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( THREE.MathUtils.degToRad );
+				curves.z.values = curves.z.values.map( MathUtils.degToRad );
 
 			}
 
@@ -2722,26 +2768,26 @@ THREE.FBXLoader = ( function () {
 
 			if ( preRotation !== undefined ) {
 
-				preRotation = preRotation.map( THREE.MathUtils.degToRad );
+				preRotation = preRotation.map( MathUtils.degToRad );
 				preRotation.push( eulerOrder );
 
-				preRotation = new THREE.Euler().fromArray( preRotation );
-				preRotation = new THREE.Quaternion().setFromEuler( preRotation );
+				preRotation = new Euler().fromArray( preRotation );
+				preRotation = new Quaternion().setFromEuler( preRotation );
 
 			}
 
 			if ( postRotation !== undefined ) {
 
-				postRotation = postRotation.map( THREE.MathUtils.degToRad );
+				postRotation = postRotation.map( MathUtils.degToRad );
 				postRotation.push( eulerOrder );
 
-				postRotation = new THREE.Euler().fromArray( postRotation );
-				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).inverse();
+				postRotation = new Euler().fromArray( postRotation );
+				postRotation = new Quaternion().setFromEuler( postRotation ).inverse();
 
 			}
 
-			var quaternion = new THREE.Quaternion();
-			var euler = new THREE.Euler();
+			var quaternion = new Quaternion();
+			var euler = new Euler();
 
 			var quaternionValues = [];
 
@@ -2758,7 +2804,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			return new THREE.QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
+			return new QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
 
 		},
 
@@ -2773,7 +2819,7 @@ THREE.FBXLoader = ( function () {
 
 			var morphNum = sceneGraph.getObjectByName( rawTracks.modelName ).morphTargetDictionary[ rawTracks.morphName ];
 
-			return new THREE.NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
+			return new NumberKeyframeTrack( rawTracks.modelName + '.morphTargetInfluences[' + morphNum + ']', curves.times, values );
 
 		},
 
@@ -3816,7 +3862,7 @@ THREE.FBXLoader = ( function () {
 			var nullByte = a.indexOf( 0 );
 			if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
 
-			return THREE.LoaderUtils.decodeText( new Uint8Array( a ) );
+			return LoaderUtils.decodeText( new Uint8Array( a ) );
 
 		}
 
@@ -3936,27 +3982,27 @@ THREE.FBXLoader = ( function () {
 
 	}
 
-	var tempEuler = new THREE.Euler();
-	var tempVec = new THREE.Vector3();
+	var tempEuler = new Euler();
+	var tempVec = new Vector3();
 
 	// generate transformation from FBX transform data
 	// ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
 	// ref: http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/_transformations_2main_8cxx-example.html,topicNumber=cpp_ref__transformations_2main_8cxx_example_htmlfc10a1e1-b18d-4e72-9dc0-70d0f1959f5e
 	function generateTransform( transformData ) {
 
-		var lTranslationM = new THREE.Matrix4();
-		var lPreRotationM = new THREE.Matrix4();
-		var lRotationM = new THREE.Matrix4();
-		var lPostRotationM = new THREE.Matrix4();
+		var lTranslationM = new Matrix4();
+		var lPreRotationM = new Matrix4();
+		var lRotationM = new Matrix4();
+		var lPostRotationM = new Matrix4();
 
-		var lScalingM = new THREE.Matrix4();
-		var lScalingPivotM = new THREE.Matrix4();
-		var lScalingOffsetM = new THREE.Matrix4();
-		var lRotationOffsetM = new THREE.Matrix4();
-		var lRotationPivotM = new THREE.Matrix4();
+		var lScalingM = new Matrix4();
+		var lScalingPivotM = new Matrix4();
+		var lScalingOffsetM = new Matrix4();
+		var lRotationOffsetM = new Matrix4();
+		var lRotationPivotM = new Matrix4();
 
-		var lParentGX = new THREE.Matrix4();
-		var lGlobalT = new THREE.Matrix4();
+		var lParentGX = new Matrix4();
+		var lGlobalT = new Matrix4();
 
 		var inheritType = ( transformData.inheritType ) ? transformData.inheritType : 0;
 
@@ -3964,7 +4010,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( THREE.MathUtils.degToRad );
+			var array = transformData.preRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -3972,7 +4018,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( THREE.MathUtils.degToRad );
+			var array = transformData.rotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -3980,7 +4026,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( THREE.MathUtils.degToRad );
+			var array = transformData.postRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -3999,17 +4045,17 @@ THREE.FBXLoader = ( function () {
 
 		// Global Rotation
 		var lLRM = lPreRotationM.multiply( lRotationM ).multiply( lPostRotationM );
-		var lParentGRM = new THREE.Matrix4();
+		var lParentGRM = new Matrix4();
 		lParentGX.extractRotation( lParentGRM );
 
 		// Global Shear*Scaling
-		var lParentTM = new THREE.Matrix4();
+		var lParentTM = new Matrix4();
 		lParentTM.copyPosition( lParentGX );
 
-		var lParentGSM = new THREE.Matrix4();
+		var lParentGSM = new Matrix4();
 		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
 
-		var lGlobalRS = new THREE.Matrix4();
+		var lGlobalRS = new Matrix4();
 
 		if ( inheritType === 0 ) {
 
@@ -4021,25 +4067,25 @@ THREE.FBXLoader = ( function () {
 
 		} else {
 
-			var lParentLSM_inv = new THREE.Matrix4().getInverse( lScalingM );
-			var lParentGSM_noLocal = new THREE.Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
+			var lParentLSM_inv = new Matrix4().getInverse( lScalingM );
+			var lParentGSM_noLocal = new Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
 
 			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
 
 		}
 
-		var lRotationPivotM_inv = new THREE.Matrix4().getInverse( lRotationPivotM );
-		var lScalingPivotM_inv = new THREE.Matrix4().getInverse( lScalingPivotM );
+		var lRotationPivotM_inv = new Matrix4().getInverse( lRotationPivotM );
+		var lScalingPivotM_inv = new Matrix4().getInverse( lScalingPivotM );
 		// Calculate the local transform matrix
-		var lTransform = new THREE.Matrix4();
+		var lTransform = new Matrix4();
 		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 
-		var lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
+		var lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
 
-		var lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
+		var lGlobalTranslation = new Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = new THREE.Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
+		lTransform = new Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
 
 		return lTransform;
 
@@ -4091,7 +4137,7 @@ THREE.FBXLoader = ( function () {
 		if ( from === undefined ) from = 0;
 		if ( to === undefined ) to = buffer.byteLength;
 
-		return THREE.LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
+		return LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
 
 	}
 
@@ -4127,3 +4173,5 @@ THREE.FBXLoader = ( function () {
 	return FBXLoader;
 
 } )();
+
+export { FBXLoader };
