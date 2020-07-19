@@ -2,9 +2,9 @@
   <head>
     <meta charset="utf-8" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <script src="js/OBJLoader.js"></script>
-    <script src="js/MTLLoader.js"></script>
+    <script  type="text/javascript" src="js/OrbitControls.js"></script>
+    <script  type="text/javascript" src="js/OBJLoader.js"></script>
+    <script  type="text/javascript" src="js/MTLLoader.js"></script>
 
 
     <script>
@@ -49,30 +49,23 @@
         const ambientLight = new THREE.AmbientLight(0x333333);
         scene.add(ambientLight);
 
-        // 3DS形式のモデルデータを読み込む
+        // 3Dのモデルデータを読み込む
 
-        /*const mtlLoader = new THREE.MTLLoader();
-        mtlLoader.load('kadai1.mtl',(materials)=>{
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.load('kadai1.mtl',function(materials){
             materials.preload();
-
-
-            const objLoader=THREE.OBJLoader();
+            var objLoader=new THREE.OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.load('kadai1.obj',(object)=>{
-                obj=new THREE.Object3D();
-                obj.add(object);
-                scene.add(obj);  
-
+            objLoader.load('kadai1.obj',function(object){
+               scene.add(object);
             });
         });
-        var obj = new THREE.Mesh();
 
-*/
 
-        var geometry = new THREE.BoxGeometry(10,10,10);
+        /*var geometry = new THREE.BoxGeometry(10,10,10);
     var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
     var box = new THREE.Mesh(geometry, material);
-    scene.add(box);
+    scene.add(box);*/
 
 
 
