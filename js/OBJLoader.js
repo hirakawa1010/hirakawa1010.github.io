@@ -1,24 +1,9 @@
+console.warn( "THREE.OBJLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	BufferGeometry,
-	FileLoader,
-	Float32BufferAttribute,
-	Group,
-	LineBasicMaterial,
-	LineSegments,
-	Loader,
-	Material,
-	Mesh,
-	MeshPhongMaterial,
-	Points,
-	PointsMaterial,
-	Vector3
-} from "../../../build/three.module.js";
-
-var OBJLoader = ( function () {
+THREE.OBJLoader = ( function () {
 
 	// o object_name | g group_name
 	var object_pattern = /^[og]\s*(.+)?/;
@@ -29,12 +14,12 @@ var OBJLoader = ( function () {
 	// usemap map_name
 	var map_use_pattern = /^usemap /;
 
-	var vA = new Vector3();
-	var vB = new Vector3();
-	var vC = new Vector3();
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
 
-	var ab = new Vector3();
-	var cb = new Vector3();
+	var ab = new THREE.Vector3();
+	var cb = new THREE.Vector3();
 
 	function ParserState() {
 
@@ -437,13 +422,13 @@ var OBJLoader = ( function () {
 
 	function OBJLoader( manager ) {
 
-		Loader.call( this, manager );
+		THREE.Loader.call( this, manager );
 
 		this.materials = null;
 
 	}
 
-	OBJLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	OBJLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: OBJLoader,
 
@@ -451,7 +436,7 @@ var OBJLoader = ( function () {
 
 			var scope = this;
 
-			var loader = new FileLoader( scope.manager );
+			var loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( this.path );
 			loader.load( url, function ( text ) {
 
@@ -726,7 +711,7 @@ var OBJLoader = ( function () {
 
 			state.finalize();
 
-			var container = new Group();
+			var container = new THREE.Group();
 			container.materialLibraries = [].concat( state.materialLibraries );
 
 			for ( var i = 0, l = state.objects.length; i < l; i ++ ) {
@@ -741,26 +726,26 @@ var OBJLoader = ( function () {
 				// Skip o/g line declarations that did not follow with any faces
 				if ( geometry.vertices.length === 0 ) continue;
 
-				var buffergeometry = new BufferGeometry();
+				var buffergeometry = new THREE.BufferGeometry();
 
-				buffergeometry.setAttribute( 'position', new Float32BufferAttribute( geometry.vertices, 3 ) );
+				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
 				if ( geometry.hasNormalIndices === true ) {
 
-					buffergeometry.setAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
+					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
 
 				}
 
 				if ( geometry.colors.length > 0 ) {
 
 					hasVertexColors = true;
-					buffergeometry.setAttribute( 'color', new Float32BufferAttribute( geometry.colors, 3 ) );
+					buffergeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( geometry.colors, 3 ) );
 
 				}
 
 				if ( geometry.hasUVIndices === true ) {
 
-					buffergeometry.setAttribute( 'uv', new Float32BufferAttribute( geometry.uvs, 2 ) );
+					buffergeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( geometry.uvs, 2 ) );
 
 				}
 
@@ -779,17 +764,17 @@ var OBJLoader = ( function () {
 						material = this.materials.create( sourceMaterial.name );
 
 						// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
-						if ( isLine && material && ! ( material instanceof LineBasicMaterial ) ) {
+						if ( isLine && material && ! ( material instanceof THREE.LineBasicMaterial ) ) {
 
-							var materialLine = new LineBasicMaterial();
-							Material.prototype.copy.call( materialLine, material );
+							var materialLine = new THREE.LineBasicMaterial();
+							THREE.Material.prototype.copy.call( materialLine, material );
 							materialLine.color.copy( material.color );
 							material = materialLine;
 
-						} else if ( isPoints && material && ! ( material instanceof PointsMaterial ) ) {
+						} else if ( isPoints && material && ! ( material instanceof THREE.PointsMaterial ) ) {
 
-							var materialPoints = new PointsMaterial( { size: 10, sizeAttenuation: false } );
-							Material.prototype.copy.call( materialPoints, material );
+							var materialPoints = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
+							THREE.Material.prototype.copy.call( materialPoints, material );
 							materialPoints.color.copy( material.color );
 							materialPoints.map = material.map;
 							material = materialPoints;
@@ -802,15 +787,15 @@ var OBJLoader = ( function () {
 
 						if ( isLine ) {
 
-							material = new LineBasicMaterial();
+							material = new THREE.LineBasicMaterial();
 
 						} else if ( isPoints ) {
 
-							material = new PointsMaterial( { size: 1, sizeAttenuation: false } );
+							material = new THREE.PointsMaterial( { size: 1, sizeAttenuation: false } );
 
 						} else {
 
-							material = new MeshPhongMaterial();
+							material = new THREE.MeshPhongMaterial();
 
 						}
 
@@ -841,15 +826,15 @@ var OBJLoader = ( function () {
 
 					if ( isLine ) {
 
-						mesh = new LineSegments( buffergeometry, createdMaterials );
+						mesh = new THREE.LineSegments( buffergeometry, createdMaterials );
 
 					} else if ( isPoints ) {
 
-						mesh = new Points( buffergeometry, createdMaterials );
+						mesh = new THREE.Points( buffergeometry, createdMaterials );
 
 					} else {
 
-						mesh = new Mesh( buffergeometry, createdMaterials );
+						mesh = new THREE.Mesh( buffergeometry, createdMaterials );
 
 					}
 
@@ -857,15 +842,15 @@ var OBJLoader = ( function () {
 
 					if ( isLine ) {
 
-						mesh = new LineSegments( buffergeometry, createdMaterials[ 0 ] );
+						mesh = new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] );
 
 					} else if ( isPoints ) {
 
-						mesh = new Points( buffergeometry, createdMaterials[ 0 ] );
+						mesh = new THREE.Points( buffergeometry, createdMaterials[ 0 ] );
 
 					} else {
 
-						mesh = new Mesh( buffergeometry, createdMaterials[ 0 ] );
+						mesh = new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] );
 
 					}
 
@@ -886,5 +871,3 @@ var OBJLoader = ( function () {
 	return OBJLoader;
 
 } )();
-
-export { OBJLoader };
