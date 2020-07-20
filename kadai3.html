@@ -34,7 +34,7 @@
           10000
         );
         // カメラの初期座標を設定
-        camera.position.set(0, 10, 10);
+        camera.position.set(0, 5, 15);
 
         // カメラコントローラーを作成
         const controls = new THREE.OrbitControls(camera);
@@ -57,9 +57,12 @@
             var objLoader=new THREE.OBJLoader();
             objLoader.setMaterials(materials);
             objLoader.load('kadai1.obj',function(object){
+              object.scale.set(0.3,0.3,0.3);
+              object.rotation.y=-1.57;
                scene.add(object);
             });
         });
+      
 
 
         /*var geometry = new THREE.BoxGeometry(10,10,10);
